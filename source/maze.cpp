@@ -63,7 +63,7 @@ Maze::Maze(float x, float y, color_t color) {
     std::vector<std::vector<cell>>::iterator row;
     for(int i = 0; i<maze.size(); i++){
         for(int j=0; j<maze[i].size();j++){
-            std::cout<<maze[i][j].s<<maze[i][j].w<<" ";
+            // std::cout<<maze[i][j].s<<maze[i][j].w<<" ";
             if(maze[i][j].s==1){
                 vertex_buffer_data.insert( vertex_buffer_data.end() ,{
                     float(i)*cell_edge+start_x, float(j)*cell_edge+start_y, 0.0f,
@@ -77,10 +77,10 @@ Maze::Maze(float x, float y, color_t color) {
                 });
             }
         }
-        std::cout<<"\n";
+        // std::cout<<"\n";
     }
     int vertices = (int)(vertex_buffer_data.size()/3);
-    std::cout<<vertices<<"\n";
+    // std::cout<<vertices<<"\n";
     // vertices = 6;
 
     this->object = create3DObject(GL_LINES, vertices, reinterpret_cast<GLfloat *>(vertex_buffer_data.data()), color, GL_FILL);
@@ -222,16 +222,16 @@ std::vector<std::vector<cell>> prims(std::vector<std::vector<cell>> grid){
         }
         neighbours.erase(neighbours.begin()+ind);
         
-        std::cout<<num_vis<<" "<<tot<<"\n";
+        // std::cout<<num_vis<<" "<<tot<<"\n";
     }
-        std::cout<<"\n";
-    for(int i = 0;i<row_tot;i++){
-        for(int j= 0; j<row_tot;j++){
-            std::cout<<visited[i][j]<<" ";
-        }
-        std::cout<<"\n";
-    }
-        std::cout<<"\n";
+        // std::cout<<"\n";
+    // for(int i = 0;i<row_tot;i++){
+    //     for(int j= 0; j<row_tot;j++){
+    //         std::cout<<visited[i][j]<<" ";
+    //     }
+    //     std::cout<<"\n";
+    // }
+        // std::cout<<"\n";
     return grid;
 
 }
