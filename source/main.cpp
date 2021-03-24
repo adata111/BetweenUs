@@ -2,6 +2,7 @@
 #include "timer.h"
 #include "maze.h"
 #include "player.h"
+#include "input.h"
 
 using namespace std;
 
@@ -15,6 +16,10 @@ GLFWwindow *window;
 
 Maze maze1;
 Player player1;
+
+
+const point START = {-3.0f,-3.0f};
+const float CELL_SIDE = 0.25f;
 
 float screen_zoom = 1, screen_center_x = 0, screen_center_y = 0;
 float camera_rotation_angle = 0;
@@ -58,10 +63,21 @@ void draw() {
 }
 
 void tick_input(GLFWwindow *window) {
-    int left  = glfwGetKey(window, GLFW_KEY_LEFT);
-    int right = glfwGetKey(window, GLFW_KEY_RIGHT);
-    if (left) {
-        // Do something
+    if(key_down){
+        player1.down();
+        key_down = false;
+    }
+    else if(key_up){
+        player1.up();
+        key_up = false;
+    }
+    else if(key_right){
+        player1.right();
+        key_right = false;
+    }
+    else if(key_left){
+        player1.left();
+        key_left = false;
     }
 }
 
@@ -77,7 +93,7 @@ void initGL(GLFWwindow *window, int width, int height) {
     // Create the models
 
     maze1       = Maze(0, 0, COLOR_BLACK);
-    player1     = Player(-2.75, -2.75, COLOR_RED);
+    player1     = Player(START.x+CELL_SIDE, START.y+CELL_SIDE, COLOR_RED);
 
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("../source/shaders/shader.vert", "../source/shaders/shader.frag");

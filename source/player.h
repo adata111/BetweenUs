@@ -13,6 +13,12 @@ public:
     void set_position(float x, float y);
     void tick();
     double speed;
+    GLfloat radius;
+    
+    void right();
+    void left();
+    void up();
+    void down();
 private:
     VAO *object;
 };

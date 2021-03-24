@@ -1,5 +1,6 @@
 #include "maze.h"
 #include "main.h"
+#include "input.h"
 
 Maze::Maze(float x, float y, color_t color) {
     this->position = glm::vec3(x, y, 0);
@@ -54,9 +55,9 @@ Maze::Maze(float x, float y, color_t color) {
     };
     std::vector<cell>::iterator temp;
     // bottom left point
-    float start_x = -3.0f; 
-    float start_y = -3.0f; 
-    float cell_edge = 0.25f; //cell edge 
+    float start_x = START.x; 
+    float start_y = START.y; 
+    float cell_edge = CELL_SIDE; //cell edge 
     // start_x += cell_edge;
     // start_y -= cell_edge;
     std::vector<std::vector<cell>> maze = create((int)(6/cell_edge));

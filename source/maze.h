@@ -3,10 +3,6 @@
 #ifndef MAZE_H
 #define MAZE_H
 
-struct point {
-    float x;
-    float y;
-};
 struct cell {
     point pos;
     int w;

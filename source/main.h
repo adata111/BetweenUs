@@ -21,6 +21,11 @@ struct color_t {
     int b;
 };
 
+struct point {
+    float x;
+    float y;
+};
+
 // nonedit.cpp
 GLFWwindow *initGLFW(int width, int height);
 GLuint     LoadShaders(const char *vertex_file_path, const char *fragment_file_path);
@@ -82,5 +87,9 @@ extern const color_t COLOR_RED;
 extern const color_t COLOR_GREEN;
 extern const color_t COLOR_BLACK;
 extern const color_t COLOR_BACKGROUND;
+
+// positions
+extern const point START ;
+extern const float CELL_SIDE;
 
 #endif

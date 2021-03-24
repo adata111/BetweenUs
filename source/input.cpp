@@ -13,6 +13,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "main.h"
+#include "input.h"
 
 bool   cannon_keyboard_input = true;
 bool   drag_pan = false, old_cki;
@@ -20,32 +21,74 @@ double drag_oldx = -1, drag_oldy = -1;
 
 using namespace std;
 
+// player movement
+bool key_up = false;
+bool key_down = false;
+bool key_left = false;
+bool key_right = false;
+
 /* Executed when a regular key is pressed/released/held-down */
 /* Prefered for Keyboard events */
 void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods) {
     // Function is called first on GLFW_PRESS.
 
     if (action == GLFW_RELEASE) {
-        // switch (key) {
-        // case GLFW_KEY_C:
-        // rectangle_rot_status = !rectangle_rot_status;
-        // break;
-        // case GLFW_KEY_P:
-        // triangle_rot_status = !triangle_rot_status;
-        // break;
-        // case GLFW_KEY_X:
-        //// do something ..
-        // break;
-        // default:
-        // break;
-        // }
+        switch (key) {
+            case GLFW_KEY_UP:
+                key_up = false;
+                break;
+            case GLFW_KEY_DOWN:
+                key_down = false;
+                break;
+            case GLFW_KEY_RIGHT:
+                key_right = false;
+                break;
+            case GLFW_KEY_LEFT:
+                key_left = false;
+                break;
+            default:
+                break;
+        }
     } else if (action == GLFW_PRESS) {
         switch (key) {
-        case GLFW_KEY_ESCAPE:
-            quit(window);
-            break;
-        default:
-            break;
+            case GLFW_KEY_UP:
+                key_up=true;
+                break;
+            case GLFW_KEY_DOWN:
+                key_down = true;
+                break;
+            case GLFW_KEY_RIGHT:
+                key_right = true;
+                break;
+            case GLFW_KEY_LEFT:
+                key_left = true;
+                break;
+            case GLFW_KEY_ESCAPE:
+                quit(window);
+                break;
+            default:
+                break;
+        }
+    }
+    else if (action == GLFW_REPEAT) {
+        switch (key) {
+            case GLFW_KEY_UP:
+                key_up=true;
+                break;
+            case GLFW_KEY_DOWN:
+                key_down = true;
+                break;
+            case GLFW_KEY_RIGHT:
+                key_right = true;
+                break;
+            case GLFW_KEY_LEFT:
+                key_left = true;
+                break;
+            case GLFW_KEY_ESCAPE:
+                quit(window);
+                break;
+            default:
+                break;
         }
     }
 }
@@ -56,6 +99,10 @@ void keyboardChar(GLFWwindow *window, unsigned int key) {
     case 'Q':
     case 'q':
         quit(window);
+        break;
+    case 'A':
+    case 'a':
+        player1.left();
         break;
     default:
         break;
