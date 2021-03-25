@@ -14,6 +14,7 @@ class Maze {
 public:
     Maze() {}
     Maze(float x, float y, color_t color);
+    std::vector<std::vector<cell>> maze;
     glm::vec3 position;
     float rotation;
     void draw(glm::mat4 VP);
@@ -21,6 +22,7 @@ public:
     void tick();
     double speed;
     std::vector<std::vector<cell>> create(int s);
+    bool wall_collision(bounding_box_t box, point dir);
 private:
     VAO *object;
 };

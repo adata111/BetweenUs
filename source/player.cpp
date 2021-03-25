@@ -4,8 +4,11 @@
 Player::Player(float x, float y, color_t color) {
     this->position = glm::vec3(x, y, 0);
     this->rotation = 0;
-    speed = 0.05f;
     radius = 1.0f;
+    scale_size= (float)CELL_SIDE/5;
+    // radius *= scale_size;
+    this->bounds = {x,y,2*radius*scale_size,radius*4*scale_size};
+    speed = CELL_SIDE;
     int num_vert = 10*3;
     int num_sides = num_vert/3;
     GLfloat z= 0.0f;
@@ -69,8 +72,8 @@ void Player::draw(glm::mat4 VP) {
     glm::mat4 rotate    = glm::rotate((float) (this->rotation * M_PI / 180.0f), glm::vec3(1, 0, 0));
     // No need as coords centered at 0, 0, 0 of cube around which we want to rotate
     // rotate          = rotate * glm::translate(glm::vec3(0, -0.6, 0));
-    float size= (float)CELL_SIDE/5;
-    translate = glm::scale(translate, glm::vec3(size, size, 1.0));  
+    
+    translate = glm::scale(translate, glm::vec3(scale_size, scale_size, 1.0));  
     Matrices.model *= (translate * rotate);
     glm::mat4 MVP = VP * Matrices.model;
     glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
@@ -82,7 +85,7 @@ void Player::set_position(float x, float y) {
 }
 
 void Player::tick() {
-    this->rotation += speed;
+    // this->rotation += speed;
     // this->position.x -= speed;
     // this->position.y -= speed;
 }
@@ -98,4 +101,11 @@ void Player::up(){
 }
 void Player::down(){
     this->position.y -= speed;
+}
+
+void Player::move(point dir){
+    this->position.x += speed*dir.x;
+    this->position.y += speed*dir.y;
+    this->bounds.x = this->position.x;
+    this->bounds.y = this->position.y;
 }

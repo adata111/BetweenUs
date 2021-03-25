@@ -102,7 +102,6 @@ void keyboardChar(GLFWwindow *window, unsigned int key) {
         break;
     case 'A':
     case 'a':
-        player1.left();
         break;
     default:
         break;

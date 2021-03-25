@@ -60,7 +60,7 @@ Maze::Maze(float x, float y, color_t color) {
     float cell_edge = CELL_SIDE; //cell edge 
     // start_x += cell_edge;
     // start_y -= cell_edge;
-    std::vector<std::vector<cell>> maze = create((int)(6/cell_edge));
+    maze = create((int)(6/cell_edge));
     std::vector<std::vector<cell>>::iterator row;
     for(int i = 0; i<maze.size(); i++){
         for(int j=0; j<maze[i].size();j++){
@@ -118,9 +118,6 @@ std::vector<std::vector<cell>> Maze::create(int side){
     for(int i=0; i<side; i++){
         row.clear();
         for(int j=0; j<side; j++){
-            if(i==1 && j==1)
-            row.push_back(cell{point{(float)i,(float)j},1,0});
-            else
             row.push_back(cell{point{(float)i,(float)j},1,1});
         }
         grid.push_back(row);
@@ -235,5 +232,38 @@ std::vector<std::vector<cell>> prims(std::vector<std::vector<cell>> grid){
         // std::cout<<"\n";
     return grid;
 
+}
+
+
+bool Maze::wall_collision(bounding_box_t box, point dir){
+    float new_x = box.x+dir.x-CELL_SIDE;
+    float new_y = box.y+dir.y-CELL_SIDE;
+    int i = (new_x-START.x)/CELL_SIDE ;
+    int j = (new_y-START.y)/CELL_SIDE ;
+    int c_i = (box.x-START.x-CELL_SIDE)/CELL_SIDE ;
+    int c_j = (box.y-START.y-CELL_SIDE)/CELL_SIDE ;
+    if(i<0 || j<0)
+        return true;
+    if(i>maze.size()-1 || j>maze.size()-1 )
+        return true;
+    std::cout<<"moving in direction: "<<dir.x<<" "<<dir.y<<"\n";
+    std::cout<<"old coordinates: "<<box.x-CELL_SIDE<<" "<<box.y-CELL_SIDE<<"\n";
+    std::cout<<"new coordinates: "<<new_x<<" "<<new_y<<"\n";
+    std::cout<<"box width height: "<<box.width<<" "<<box.height<<"\n";
+    std::cout<<"old cell coordinates: "<<maze[c_i][c_j].pos.x<<" "<<maze[c_i][c_j].pos.y<<"\n";
+    std::cout<<"old cell w s: "<<maze[c_i][c_j].w<<" "<<maze[c_i][c_j].s<<"\n";
+    std::cout<<"cell coordinates: "<<maze[i][j].pos.x<<" "<<maze[i][j].pos.y<<"\n";
+    std::cout<<"cell w s: "<<maze[i][j].w<<" "<<maze[i][j].s<<"\n";
+    if(new_x<=float(i)*CELL_SIDE+START.x && maze[i][j].w==1 && dir.x>0)
+        return true;
+    if(new_y<=float(j)*CELL_SIDE+START.y && maze[i][j].s==1 && dir.y>0)
+        return true;
+    if(c_i>maze.size()-1 || c_j>maze.size()-1 )
+        return true;
+    if(maze[c_i][c_j].w==1 && dir.x<0)
+        return true;
+    if(maze[c_i][c_j].s==1 && dir.y<0)
+        return true;
+    return false;
 }
 

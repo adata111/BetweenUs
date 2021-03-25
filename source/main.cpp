@@ -64,19 +64,23 @@ void draw() {
 
 void tick_input(GLFWwindow *window) {
     if(key_down){
-        player1.down();
+        if(maze1.wall_collision(player1.bounds, point{0,-1*player1.speed})==false)
+            player1.move(point{0,-1});
         key_down = false;
     }
     else if(key_up){
-        player1.up();
+        if(maze1.wall_collision(player1.bounds, point{0,1*player1.speed})==false)
+            player1.move(point{0,1});
         key_up = false;
     }
     else if(key_right){
-        player1.right();
+        if(maze1.wall_collision(player1.bounds, point{1*player1.speed,0})==false)
+            player1.move(point{1,0});
         key_right = false;
     }
     else if(key_left){
-        player1.left();
+        if(maze1.wall_collision(player1.bounds, point{-1*player1.speed,0})==false)
+            player1.move(point{-1,0});
         key_left = false;
     }
 }
@@ -93,7 +97,8 @@ void initGL(GLFWwindow *window, int width, int height) {
     // Create the models
 
     maze1       = Maze(0, 0, COLOR_BLACK);
-    player1     = Player(START.x+CELL_SIDE, START.y+CELL_SIDE, COLOR_RED);
+    player1     = Player(START.x+(6.0f*CELL_SIDE/6), START.y+(6.0f*CELL_SIDE/6), COLOR_RED);
+    // player1     = Player(-1.42, -1.42, COLOR_RED);
 
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("../source/shaders/shader.vert", "../source/shaders/shader.frag");
