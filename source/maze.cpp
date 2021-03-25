@@ -28,6 +28,7 @@ Maze::Maze(float x, float y, color_t color) {
     std::vector<std::vector<cell>>::iterator row;
     for(int i = 0; i<maze.size(); i++){
         for(int j=0; j<maze[i].size();j++){
+            maze[i][j].pos = point{float(i)*cell_edge+start_x,float(j)*cell_edge+start_y};
             // std::cout<<maze[i][j].s<<maze[i][j].w<<" ";
             if(maze[i][j].s==1){
                 vertex_buffer_data.insert( vertex_buffer_data.end() ,{
@@ -198,7 +199,7 @@ std::vector<std::vector<cell>> prims(std::vector<std::vector<cell>> grid){
 
 }
 
-
+/*
 bool Maze::wall_collision(bounding_box_t box, point dir){
     float new_x = box.x+dir.x-CELL_SIDE;
     float new_y = box.y+dir.y-CELL_SIDE;
@@ -210,14 +211,14 @@ bool Maze::wall_collision(bounding_box_t box, point dir){
         return true;
     if(i>maze.size()-1 || j>maze.size()-1 )
         return true;
-    std::cout<<"moving in direction: "<<dir.x<<" "<<dir.y<<"\n";
-    std::cout<<"old coordinates: "<<box.x-CELL_SIDE<<" "<<box.y-CELL_SIDE<<"\n";
-    std::cout<<"new coordinates: "<<new_x<<" "<<new_y<<"\n";
-    std::cout<<"box width height: "<<box.width<<" "<<box.height<<"\n";
-    std::cout<<"old cell coordinates: "<<maze[c_i][c_j].pos.x<<" "<<maze[c_i][c_j].pos.y<<"\n";
-    std::cout<<"old cell w s: "<<maze[c_i][c_j].w<<" "<<maze[c_i][c_j].s<<"\n";
-    std::cout<<"cell coordinates: "<<maze[i][j].pos.x<<" "<<maze[i][j].pos.y<<"\n";
-    std::cout<<"cell w s: "<<maze[i][j].w<<" "<<maze[i][j].s<<"\n";
+    // std::cout<<"moving in direction: "<<dir.x<<" "<<dir.y<<"\n";
+    // std::cout<<"old coordinates: "<<box.x-CELL_SIDE<<" "<<box.y-CELL_SIDE<<"\n";
+    // std::cout<<"new coordinates: "<<new_x<<" "<<new_y<<"\n";
+    // std::cout<<"box width height: "<<box.width<<" "<<box.height<<"\n";
+    // std::cout<<"old cell coordinates: "<<maze[c_i][c_j].pos.x<<" "<<maze[c_i][c_j].pos.y<<"\n";
+    // std::cout<<"old cell w s: "<<maze[c_i][c_j].w<<" "<<maze[c_i][c_j].s<<"\n";
+    // std::cout<<"cell coordinates: "<<maze[i][j].pos.x<<" "<<maze[i][j].pos.y<<"\n";
+    // std::cout<<"cell w s: "<<maze[i][j].w<<" "<<maze[i][j].s<<"\n";
     if(new_x<=float(i)*CELL_SIDE+START.x && maze[i][j].w==1 && dir.x>0)
         return true;
     if(new_y<=float(j)*CELL_SIDE+START.y && maze[i][j].s==1 && dir.y>0)
@@ -230,37 +231,58 @@ bool Maze::wall_collision(bounding_box_t box, point dir){
         return true;
     return false;
 }
+*/
+
+bool Maze::wall_collision(int i, int j, point dir){
+    float new_i = i+dir.x;
+    float new_j = j+dir.y;
+    if(new_i<0 || new_j<0)
+        return true;
+    if(new_i>maze.size()-1 || new_j>maze.size()-1 )
+        return true;
+    if(maze[new_i][new_j].w==1 && dir.x>0)
+        return true;
+    if( maze[new_i][new_j].s==1 && dir.y>0)
+        return true;
+    if(i>maze.size()-1 || j>maze.size()-1 ) //not really needed
+        return true;
+    if(maze[i][j].w==1 && dir.x<0)
+        return true;
+    if(maze[i][j].s==1 && dir.y<0)
+        return true;
+    return false;
+}
 
 void Maze::create_graph(int s){   
     // std::vector<point> **grap = (std::vector<point>**)malloc(s * sizeof(std::vector<point>*));
     // for (int i=0; i<s; i++)
     //      grap[i] = (std::vector<point>*)malloc(s * sizeof(std::vector<point>));
     // std::vector<point> grap[s][s];
-    std::cout<<"hi\n";
+    // std::cout<<"hi\n";
     for(int i=s-1;i>=0;i--){
         for(int j=s-1;j>=0;j--){
-            graph[i][j].clear();
-            std::cout<<"1. i j: "<<i<<" "<<j<<"\n";
+            // graph[i][j].clear();
+            // std::cout<<"1. i j: "<<i<<" "<<j<<"\n";
             if(maze[i][j].s==0){
-                std::cout<<"south\n";
+                // std::cout<<"south\n";
                 graph[i][j].push_back(point{(float)i,(float)j-1});
                 graph[i][j-1].push_back(point{(float)i,(float)j});
             }
             if(maze[i][j].w==0){
-                std::cout<<"west\n";
+                // std::cout<<"west\n";
                 graph[i][j].push_back(point{(float)i-1,(float)j});
                 graph[i-1][j].push_back(point{(float)i,(float)j});
             }
         }
     }
-    for(int i=0; i<s; i++){
-        for(int j=0;j<s;j++){
-            std::cout<<"i j: "<<i<<" "<<j<<"\n";
-            for(auto it=graph[i][j].begin();it!=graph[i][j].end();it++){
-                std::cout<<it->x<<" "<<it->y<<"\t";
-            }
-            std::cout<<"\n";
-        }
-    }
+    // for(int i=0; i<s; i++){
+    //     for(int j=0;j<s;j++){
+    //         std::cout<<"i j: "<<i<<" "<<j<<"\n";
+    //         for(auto it=graph[i][j].begin();it!=graph[i][j].end();it++){
+    //             std::cout<<it->x<<" "<<it->y<<"\t";
+    //         }
+    //         std::cout<<"\n";
+    //     }
+    // }
     // this->graph = grap;
 }

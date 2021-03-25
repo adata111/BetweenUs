@@ -6,9 +6,11 @@
 class Player {
 public:
     Player() {}
-    Player(float x, float y, color_t color);
+    Player(int x, int y, color_t color);
     glm::vec3 position;
     bounding_box_t bounds;
+    int maze_x;
+    int maze_y;
     float scale_size;
     float rotation;
     void draw(glm::mat4 VP);

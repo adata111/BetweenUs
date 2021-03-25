@@ -1,13 +1,13 @@
-#include "player.h"
+#include "enemy.h"
 #include "main.h"
 
-Player::Player(int mx, int my, color_t color) {
+Enemy::Enemy(int mx, int my, point pos, color_t color) {
     this->maze_x = mx;
     this->maze_y = my;
     this->position = glm::vec3((START.x+(CELL_SIDE* float(mx+0.5)))/2, (START.y+(CELL_SIDE* float(my+0.5)))/2, 0);
     // std::cout<<"//////////////////////////////////////\n";
     std::cout<<position.x<<" "<<position.y<<"\n";
-    // std::cout<<pos.x<<" "<<pos.y<<"\n";
+    std::cout<<pos.x<<" "<<pos.y<<"\n";
     // this->position = glm::vec3(0.0f,0.0f,0.0f);
     float x = position.x;
     float y = position.y;
@@ -75,48 +75,139 @@ Player::Player(int mx, int my, color_t color) {
     this->object = create3DObject(GL_TRIANGLES, tot_vert, reinterpret_cast<GLfloat *>(vertex_buffer_data.data()), color, GL_FILL);
 }
 
-void Player::draw(glm::mat4 VP) {
+void Enemy::draw(glm::mat4 VP) {
      Matrices.model = glm::mat4(1.0f);
+    // this->position = glm::vec3(START.x + (float)CELL_SIDE*this->maze_x, START.y + (float)CELL_SIDE*this->maze_y, 0.0f);
     glm::mat4 translate = glm::translate (this->position);    // glTranslatef
     glm::mat4 rotate    = glm::rotate((float) (this->rotation * M_PI / 180.0f), glm::vec3(1, 0, 0));
     // No need as coords centered at 0, 0, 0 of cube arouund which we waant to rotate
     // rotate          = rotate * glm::translate(glm::vec3(0, -0.6, 0));
-    // translate = glm::scale(translate, glm::vec3(scale_size, scale_size, 1.0));
     Matrices.model *= (translate * rotate);
     glm::mat4 MVP = VP * Matrices.model;
     glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
     draw3DObject(this->object);
 }
 
-
-void Player::set_position(float x, float y) {
+void Enemy::set_position(float x, float y) {
     this->position = glm::vec3(x, y, 0);
 }
 
-void Player::tick() {
+void Enemy::tick() {
     // this->rotation += speed;
     // this->position.x -= speed;
     // this->position.y -= speed;
 }
 
-void Player::right(){
+void Enemy::right(){
     this->position.x += speed;
 }
-void Player::left(){
+void Enemy::left(){
     this->position.x -= speed;
 }
-void Player::up(){
+void Enemy::up(){
     this->position.y += speed;
 }
-void Player::down(){
+void Enemy::down(){
     this->position.y -= speed;
 }
 
-void Player::move(point dir){
-    this->position.x += speed*dir.x;
-    this->position.y += speed*dir.y;
-    this->maze_x += dir.x;
-    this->maze_y += dir.y;
-    this->bounds.x = this->position.x;
-    this->bounds.y = this->position.y;
+// A utility function to find the
+// vertex with minimum distance
+// value, from the set of vertices
+// not yet included in shortest
+// path tree
+point minDistance(std::vector<std::vector<int>> dist,
+				std::vector<std::vector<int>> visSet)
+{
+	// Initialize min value
+	int min = INT_MAX;
+    point min_index = {-1,-1};
+
+	for (int v = 0; v < NUM_CELLS; v++){
+        for(int i=0; i<NUM_CELLS; i++){
+            if (visSet[v][i] == 0 && dist[v][i] <= min){
+                min = dist[v][i];
+                min_index.x = v;
+                min_index.y = i;
+            }
+        }
+    }
+	return min_index;
+}
+
+void Enemy::move_dijkstra(std::vector<point> graph[100][100],point player){
+    if(player.x==maze_x && player.y==maze_y){
+        std::cout<<"collide\n";
+        this->maze_x = NUM_CELLS-1;
+        this->maze_y = NUM_CELLS-1;
+        // this->position = glm::vec3((START.x+(CELL_SIDE* float(NUM_CELLS-1+0.1))), (START.y+(CELL_SIDE* float(NUM_CELLS-1+0.1))), 0);
+    }
+    std::vector<std::vector<int>> visited;
+    std::vector<std::vector<int>> dist;
+    std::vector<std::vector<point>> par;
+    std::vector<int> row;
+    std::vector<int> row_dist;
+    std::vector<point> row_par;
+    int tot = 0;
+    int inf=1e+9;
+    for(int i=0; i<NUM_CELLS; i++){
+        // std::cout<<i<<"\n";
+        row.clear();
+        row_dist.clear();
+        row_par.clear();
+        for(int j=0; j<NUM_CELLS; j++){
+            row.push_back(0);
+            row_par.push_back(point{-1,-1});
+            // if(i==0 && j==0)
+            //     row_dist.emplace_back(0);
+            // else
+                row_dist.emplace_back(inf);
+            tot++;
+        }
+        visited.push_back(row);
+        dist.emplace_back(row_dist);
+        par.push_back(row_par);
+        // std::cout<<i<<"\n";
+    }
+    if(tot<=1){
+        return;
+    }
+    int i = player.x, j=player.y;
+    // std::cout<<i<<" "<<j<<"\n";
+    dist[i][j]=0;
+    point temp;
+    while(1){
+        // std::cout<<i<<"\n";
+        for(auto it=graph[i][j].begin();it!=graph[i][j].end();it++){
+            if(visited[it->x][it->y])
+                continue;
+            if(dist[it->x][it->y] > dist[i][j]+1){
+                dist[it->x][it->y] = dist[i][j]+1;
+                par[it->x][it->y] = point{(float)i, (float)j};
+            }
+        }
+        visited[i][j]=1;
+        if(i==maze_x && j==maze_y){
+            // for(int a=0;a<NUM_CELLS;a++){
+            //     for(int b = 0; b<NUM_CELLS; b++)
+            //         std::cout<<dist[a][b]<<" ";
+            //     std::cout<<"\n";
+            // }
+            // std::cout<<"dist: "<<dist[i][j]<<"\n";
+            std::cout<<"par: "<<par[i][j].x<<" "<<par[i][j].y<<"\n";
+            break;
+        }
+        temp=minDistance(dist, visited);
+        i=temp.x;
+        j=temp.y;
+        if(i==-1 && j==-1)
+            break;
+        
+    }
+    if(i!=-1 && j!=-1){
+        this->maze_x = par[i][j].x;
+        this->maze_y = par[i][j].y;
+        this->position = glm::vec3((START.x+(CELL_SIDE* float(maze_x-0.25))), (START.y+(CELL_SIDE* float(maze_y+0.25))), 0);
+    }
+    
 }

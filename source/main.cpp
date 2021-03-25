@@ -2,6 +2,7 @@
 #include "timer.h"
 #include "maze.h"
 #include "player.h"
+#include "enemy.h"
 #include "input.h"
 
 using namespace std;
@@ -16,16 +17,19 @@ GLFWwindow *window;
 
 Maze maze1;
 Player player1;
+Enemy enemy1;
 
 const int NUM_CELLS = 24;
 const float CELL_SIDE = (float)6/NUM_CELLS;
 const point START = {-3.0f,-3.0f};
 const point END = {3.0f-CELL_SIDE, 3.0f-CELL_SIDE};
+std::vector<std::vector<int>> vis;
 
 float screen_zoom = 1, screen_center_x = 0, screen_center_y = 0;
 float camera_rotation_angle = 0;
 
 Timer t60(1.0 / 60);
+Timer t1(1.0);
 
 /* Render the scene with openGL */
 /* Edit this function according to your assignment */
@@ -61,26 +65,40 @@ void draw() {
     // Scene render
     maze1.draw(VP);
     player1.draw(VP);
+    // std::vector<int> row;
+    // std::cout<<"hihi1\n";
+    //     vis.clear();
+    // for(int i=0;i<NUM_CELLS;i++){
+    //     for(int j=0;j<NUM_CELLS;j++){
+    //         row.push_back(0);
+    //     }
+    //     std::cout<<i<<"\n";
+    //     vis.push_back(row);
+    // }
+    // std::cout<<enemy1.maze_x<<" "<<enemy1.maze_y<<"\n";
+
+    enemy1.draw(VP);
 }
 
 void tick_input(GLFWwindow *window) {
+
     if(key_down){
-        if(maze1.wall_collision(player1.bounds, point{0,-1*player1.speed})==false)
+        if(maze1.wall_collision(player1.maze_x, player1.maze_y, point{0,-1})==false)
             player1.move(point{0,-1});
         key_down = false;
     }
     else if(key_up){
-        if(maze1.wall_collision(player1.bounds, point{0,1*player1.speed})==false)
+        if(maze1.wall_collision(player1.maze_x, player1.maze_y, point{0,1})==false)
             player1.move(point{0,1});
         key_up = false;
     }
     else if(key_right){
-        if(maze1.wall_collision(player1.bounds, point{1*player1.speed,0})==false)
+        if(maze1.wall_collision(player1.maze_x, player1.maze_y, point{1,0})==false)
             player1.move(point{1,0});
         key_right = false;
     }
     else if(key_left){
-        if(maze1.wall_collision(player1.bounds, point{-1*player1.speed,0})==false)
+        if(maze1.wall_collision(player1.maze_x, player1.maze_y, point{-1,0})==false)
             player1.move(point{-1,0});
         key_left = false;
     }
@@ -98,7 +116,8 @@ void initGL(GLFWwindow *window, int width, int height) {
     // Create the models
 
     maze1       = Maze(0, 0, COLOR_BLACK);
-    player1     = Player(START.x+(6.0f*CELL_SIDE/6), START.y+(6.0f*CELL_SIDE/6), COLOR_BLUE);
+    player1     = Player(0,0, COLOR_BLUE);
+    enemy1     = Enemy(13, 12, maze1.maze[13][12].pos, COLOR_RED);
     // player1     = Player(-1.42, -1.42, COLOR_RED);
 
     // Create and compile our GLSL program from the shaders
@@ -131,7 +150,7 @@ int main(int argc, char **argv) {
     window = initGLFW(width, height);
 
     initGL (window, width, height);
-
+    
     /* Draw in loop */
     while (!glfwWindowShouldClose(window)) {
         // Process timers
@@ -145,6 +164,10 @@ int main(int argc, char **argv) {
 
             // tick_elements();
             tick_input(window);
+        }
+        if (t1.processTick()){
+            
+            enemy1.move_dijkstra(maze1.graph, point{(float)player1.maze_x, (float)player1.maze_y});
         }
 
         // Poll for Keyboard and mouse events
