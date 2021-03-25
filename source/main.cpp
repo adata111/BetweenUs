@@ -17,9 +17,10 @@ GLFWwindow *window;
 Maze maze1;
 Player player1;
 
-
+const int NUM_CELLS = 24;
+const float CELL_SIDE = (float)6/NUM_CELLS;
 const point START = {-3.0f,-3.0f};
-const float CELL_SIDE = 0.25f;
+const point END = {3.0f-CELL_SIDE, 3.0f-CELL_SIDE};
 
 float screen_zoom = 1, screen_center_x = 0, screen_center_y = 0;
 float camera_rotation_angle = 0;
@@ -97,7 +98,7 @@ void initGL(GLFWwindow *window, int width, int height) {
     // Create the models
 
     maze1       = Maze(0, 0, COLOR_BLACK);
-    player1     = Player(START.x+(6.0f*CELL_SIDE/6), START.y+(6.0f*CELL_SIDE/6), COLOR_RED);
+    player1     = Player(START.x+(6.0f*CELL_SIDE/6), START.y+(6.0f*CELL_SIDE/6), COLOR_BLUE);
     // player1     = Player(-1.42, -1.42, COLOR_RED);
 
     // Create and compile our GLSL program from the shaders

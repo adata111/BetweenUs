@@ -9,43 +9,6 @@ Maze::Maze(float x, float y, color_t color) {
     // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
     // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
     std::vector<GLfloat> vertex_buffer_data = {
-        // -1.0f,-1.0f,-1.0f, // triangle 1 : begin
-        // -1.0f,-1.0f, 1.0f,
-        // -1.0f, 1.0f, 1.0f, // triangle 1 : end
-        // 1.0f, 1.0f,-1.0f, // triangle 2 : begin
-        // -1.0f,-1.0f,-1.0f,
-        // -1.0f, 1.0f,-1.0f, // triangle 2 : end
-        // 1.0f,-1.0f, 1.0f,
-        // -1.0f,-1.0f,-1.0f,
-        // 1.0f,-1.0f,-1.0f,
-        // 1.0f, 1.0f,-1.0f,
-        // 1.0f,-1.0f,-1.0f,
-        // -1.0f,-1.0f,-1.0f,
-        // -1.0f,-1.0f,-1.0f,
-        // -1.0f, 1.0f, 1.0f,
-        // -1.0f, 1.0f,-1.0f,
-        // 1.0f,-1.0f, 1.0f,
-        // -1.0f,-1.0f, 1.0f,
-        // -1.0f,-1.0f,-1.0f,
-        // -1.0f, 1.0f, 1.0f,
-        // -1.0f,-1.0f, 1.0f,
-        // 1.0f,-1.0f, 1.0f,
-        // 1.0f, 1.0f, 1.0f,
-        // 1.0f,-1.0f,-1.0f,
-        // 1.0f, 1.0f,-1.0f,
-        // 1.0f,-1.0f,-1.0f,
-        // 1.0f, 1.0f, 1.0f,
-        // 1.0f,-1.0f, 1.0f,
-        // 1.0f, 1.0f, 1.0f,
-        // 1.0f, 1.0f,-1.0f,
-        // -1.0f, 1.0f,-1.0f,
-        // 1.0f, 1.0f, 1.0f,
-        // -1.0f, 1.0f,-1.0f,
-        // -1.0f, 1.0f, 1.0f,
-        // 3.0f, 3.0f, 0.0f,
-        // -3.0f, 3.0f, 0.0f,
-        // -3.0f, 3.0f, 0.0f,
-        // -3.0f,-3.0f, 0.0f,
         // north long line
         -3.0f,3.0f, 0.0f,
         3.0f,3.0f, 0.0f,
@@ -61,6 +24,7 @@ Maze::Maze(float x, float y, color_t color) {
     // start_x += cell_edge;
     // start_y -= cell_edge;
     maze = create((int)(6/cell_edge));
+    create_graph(maze.size());
     std::vector<std::vector<cell>>::iterator row;
     for(int i = 0; i<maze.size(); i++){
         for(int j=0; j<maze[i].size();j++){
@@ -267,3 +231,36 @@ bool Maze::wall_collision(bounding_box_t box, point dir){
     return false;
 }
 
+void Maze::create_graph(int s){   
+    // std::vector<point> **grap = (std::vector<point>**)malloc(s * sizeof(std::vector<point>*));
+    // for (int i=0; i<s; i++)
+    //      grap[i] = (std::vector<point>*)malloc(s * sizeof(std::vector<point>));
+    // std::vector<point> grap[s][s];
+    std::cout<<"hi\n";
+    for(int i=s-1;i>=0;i--){
+        for(int j=s-1;j>=0;j--){
+            graph[i][j].clear();
+            std::cout<<"1. i j: "<<i<<" "<<j<<"\n";
+            if(maze[i][j].s==0){
+                std::cout<<"south\n";
+                graph[i][j].push_back(point{(float)i,(float)j-1});
+                graph[i][j-1].push_back(point{(float)i,(float)j});
+            }
+            if(maze[i][j].w==0){
+                std::cout<<"west\n";
+                graph[i][j].push_back(point{(float)i-1,(float)j});
+                graph[i-1][j].push_back(point{(float)i,(float)j});
+            }
+        }
+    }
+    for(int i=0; i<s; i++){
+        for(int j=0;j<s;j++){
+            std::cout<<"i j: "<<i<<" "<<j<<"\n";
+            for(auto it=graph[i][j].begin();it!=graph[i][j].end();it++){
+                std::cout<<it->x<<" "<<it->y<<"\t";
+            }
+            std::cout<<"\n";
+        }
+    }
+    // this->graph = grap;
+}

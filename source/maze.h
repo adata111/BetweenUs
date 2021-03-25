@@ -22,6 +22,8 @@ public:
     void tick();
     double speed;
     std::vector<std::vector<cell>> create(int s);
+    void create_graph(int s);
+    std::vector<point> graph[100][100];
     bool wall_collision(bounding_box_t box, point dir);
 private:
     VAO *object;

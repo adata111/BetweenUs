@@ -86,10 +86,15 @@ void reset_screen();
 extern const color_t COLOR_RED;
 extern const color_t COLOR_GREEN;
 extern const color_t COLOR_BLACK;
+extern const color_t COLOR_BLUE;
+extern const color_t COLOR_GREY;
 extern const color_t COLOR_BACKGROUND;
 
 // positions
 extern const point START ;
+extern const point END ;
+extern int TASKS ;
 extern const float CELL_SIDE;
+extern const int NUM_CELLS;
 
 #endif
