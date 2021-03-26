@@ -4,7 +4,8 @@
 Enemy::Enemy(int mx, int my, point pos, color_t color) {
     this->maze_x = mx;
     this->maze_y = my;
-    this->position = glm::vec3((START.x+(CELL_SIDE* float(mx+0.5)))/2, (START.y+(CELL_SIDE* float(my+0.5)))/2, 0);
+    this->position = glm::vec3((START.x+(CELL_SIDE* float(mx+0.5))), (START.y+(CELL_SIDE* float(my+0.5))), 0);
+    this->start_pos = this->position;
     // std::cout<<"//////////////////////////////////////\n";
     std::cout<<position.x<<" "<<position.y<<"\n";
     std::cout<<pos.x<<" "<<pos.y<<"\n";
@@ -14,7 +15,7 @@ Enemy::Enemy(int mx, int my, point pos, color_t color) {
     this->rotation = 0;
     radius = 1.0f;
     scale_size= (float)CELL_SIDE/5;
-    radius *= scale_size;
+    // radius *= scale_size;
     // this->bounds = {position.x,position.y,2*radius*scale_size,radius*4*scale_size};
     speed = CELL_SIDE;
     int num_vert = 10*3;
@@ -82,7 +83,11 @@ void Enemy::draw(glm::mat4 VP) {
     glm::mat4 rotate    = glm::rotate((float) (this->rotation * M_PI / 180.0f), glm::vec3(1, 0, 0));
     // No need as coords centered at 0, 0, 0 of cube arouund which we waant to rotate
     // rotate          = rotate * glm::translate(glm::vec3(0, -0.6, 0));
-    Matrices.model *= (translate * rotate);
+    
+    glm::mat4 neg_translate = glm::translate (-this->start_pos);
+    glm::mat4 scale = glm::scale(glm::vec3(scale_size, scale_size, 1.0));
+
+    Matrices.model *= (translate * rotate * scale * neg_translate );
     glm::mat4 MVP = VP * Matrices.model;
     glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
     draw3DObject(this->object);
@@ -135,12 +140,12 @@ point minDistance(std::vector<std::vector<int>> dist,
 	return min_index;
 }
 
-void Enemy::move_dijkstra(std::vector<point> graph[100][100],point player){
+void Enemy::move_dijkstra(std::vector<point> graph[100][100], point player){
     if(player.x==maze_x && player.y==maze_y){
         std::cout<<"collide\n";
         this->maze_x = NUM_CELLS-1;
         this->maze_y = NUM_CELLS-1;
-        // this->position = glm::vec3((START.x+(CELL_SIDE* float(NUM_CELLS-1+0.1))), (START.y+(CELL_SIDE* float(NUM_CELLS-1+0.1))), 0);
+        this->position = glm::vec3((START.x+(CELL_SIDE* float(maze_x+0.5))), (START.y+(CELL_SIDE* float(maze_y+0.5))), 0);
     }
     std::vector<std::vector<int>> visited;
     std::vector<std::vector<int>> dist;
@@ -207,7 +212,13 @@ void Enemy::move_dijkstra(std::vector<point> graph[100][100],point player){
     if(i!=-1 && j!=-1){
         this->maze_x = par[i][j].x;
         this->maze_y = par[i][j].y;
-        this->position = glm::vec3((START.x+(CELL_SIDE* float(maze_x-0.25))), (START.y+(CELL_SIDE* float(maze_y+0.25))), 0);
+        this->position = glm::vec3((START.x+(CELL_SIDE* float(maze_x+0.5))), (START.y+(CELL_SIDE* float(maze_y+0.5))), 0);
+    }
+    if(player.x==maze_x && player.y==maze_y){
+        std::cout<<"collide\n";
+        this->maze_x = NUM_CELLS-1;
+        this->maze_y = NUM_CELLS-1;
+        this->position = glm::vec3((START.x+(CELL_SIDE* float(maze_x+0.5))), (START.y+(CELL_SIDE* float(maze_y+0.5))), 0);
     }
     
 }

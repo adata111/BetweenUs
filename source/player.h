@@ -8,6 +8,7 @@ public:
     Player() {}
     Player(int x, int y, color_t color);
     glm::vec3 position;
+    glm::vec3 start_pos;
     bounding_box_t bounds;
     int maze_x;
     int maze_y;

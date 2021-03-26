@@ -105,8 +105,8 @@ void tick_input(GLFWwindow *window) {
 }
 
 void tick_elements() {
-    maze1.tick();
-    camera_rotation_angle += 1;
+    player1.tick();
+    // camera_rotation_angle += 1;
 }
 
 /* Initialize the OpenGL rendering properties */

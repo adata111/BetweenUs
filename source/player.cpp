@@ -4,7 +4,8 @@
 Player::Player(int mx, int my, color_t color) {
     this->maze_x = mx;
     this->maze_y = my;
-    this->position = glm::vec3((START.x+(CELL_SIDE* float(mx+0.5)))/2, (START.y+(CELL_SIDE* float(my+0.5)))/2, 0);
+    this->position = glm::vec3((START.x+(CELL_SIDE* float(mx+0.5))), (START.y+(CELL_SIDE* float(my+0.5))), 0);
+    this->start_pos = this->position;
     // std::cout<<"//////////////////////////////////////\n";
     std::cout<<position.x<<" "<<position.y<<"\n";
     // std::cout<<pos.x<<" "<<pos.y<<"\n";
@@ -14,7 +15,7 @@ Player::Player(int mx, int my, color_t color) {
     this->rotation = 0;
     radius = 1.0f;
     scale_size= (float)CELL_SIDE/5;
-    radius *= scale_size;
+    // radius *= scale_size;
     // this->bounds = {position.x,position.y,2*radius*scale_size,radius*4*scale_size};
     speed = CELL_SIDE;
     int num_vert = 10*3;
@@ -77,12 +78,16 @@ Player::Player(int mx, int my, color_t color) {
 
 void Player::draw(glm::mat4 VP) {
      Matrices.model = glm::mat4(1.0f);
+    // std::cout<<maze_x<<" "<<maze_y<<"   "<<position.x<<" "<<position.y<<"\n";
     glm::mat4 translate = glm::translate (this->position);    // glTranslatef
-    glm::mat4 rotate    = glm::rotate((float) (this->rotation * M_PI / 180.0f), glm::vec3(1, 0, 0));
+    glm::mat4 rotate    = glm::rotate((float) (this->rotation * M_PI / 180.0f), glm::vec3(0, 0, 1));
     // No need as coords centered at 0, 0, 0 of cube arouund which we waant to rotate
     // rotate          = rotate * glm::translate(glm::vec3(0, -0.6, 0));
-    // translate = glm::scale(translate, glm::vec3(scale_size, scale_size, 1.0));
-    Matrices.model *= (translate * rotate);
+    glm::mat4 neg_translate = glm::translate (-this->start_pos);
+    glm::mat4 scale = glm::scale(glm::vec3(scale_size, scale_size, 1.0));
+    // rotate = rotate * glm::translate(-this->position);
+    // scale = scale * glm::translate(-this->position);
+    Matrices.model *= (translate * rotate * scale * neg_translate );
     glm::mat4 MVP = VP * Matrices.model;
     glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
     draw3DObject(this->object);
@@ -94,7 +99,7 @@ void Player::set_position(float x, float y) {
 }
 
 void Player::tick() {
-    // this->rotation += speed;
+    this->rotation += 1;
     // this->position.x -= speed;
     // this->position.y -= speed;
 }
@@ -117,6 +122,8 @@ void Player::move(point dir){
     this->position.y += speed*dir.y;
     this->maze_x += dir.x;
     this->maze_y += dir.y;
+    int mx=this->maze_x;int my=this->maze_y;
+    // this->position = glm::vec3((START.x+(CELL_SIDE* float(mx+0.5))), (START.y+(CELL_SIDE* float(my+0.5))), 0);
     this->bounds.x = this->position.x;
     this->bounds.y = this->position.y;
 }
