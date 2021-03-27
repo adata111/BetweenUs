@@ -9,7 +9,7 @@ Collectible::Collectible(int mx, int my, color_t color, int points) {
     // std::cout<<"collectible coords "<<start_pos.x<<" "<<start_pos.y<<"\n";
     float x = position.x;
     float y = position.y;
-    this->visible = 1;
+    this->visible = 0;
     this->rotation = 0;
     this->points = points;
     radius = 1.0f;

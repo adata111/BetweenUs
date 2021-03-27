@@ -21,6 +21,7 @@ Maze maze1;
 Player player1;
 Enemy enemy1;
 Button vapouriser;
+Button release_collectible;
 Collectible coins[100];
 Collectible bombs[100];
 
@@ -72,6 +73,8 @@ void draw() {
     maze1.draw(VP);
     if(vapouriser.visible)
         vapouriser.draw(VP);
+    if(release_collectible.visible)
+        release_collectible.draw(VP);
     for(int ind=0; ind<NUM_CELLS; ind++){
         if(coins[ind].visible)
             coins[ind].draw(VP);
@@ -124,6 +127,13 @@ void check_obj_collision(){
         if(bombs[ind].visible && bombs[ind].maze_x == player1.maze_x && bombs[ind].maze_y==player1.maze_y)
             bombs[ind].collect();
     }
+    if(player1.maze_x==release_collectible.maze_x && player1.maze_y==release_collectible.maze_y && release_collectible.visible){
+        release_collectible.visible=0;
+        for(int ind=0; ind<NUM_CELLS; ind++){
+            coins[ind].visible=1;
+            bombs[ind].visible=1;
+        }
+    }
 }
 
 /* Initialize the OpenGL rendering properties */
@@ -136,7 +146,8 @@ void initGL(GLFWwindow *window, int width, int height) {
     maze1       = Maze(0, 0, COLOR_BLACK);
     player1     = Player(0,0, COLOR_BLUE);
     enemy1     = Enemy(13, 12, maze1.maze[13][12].pos, COLOR_RED);
-    vapouriser   = Button(NUM_CELLS/2, (NUM_CELLS-1), COLOR_GREEN);
+    vapouriser   = Button(NUM_CELLS/2, (NUM_CELLS-1), COLOR_RED_TRUE);
+    release_collectible   = Button(NUM_CELLS/6 + rand()%(5*NUM_CELLS/6), rand()%(NUM_CELLS), COLOR_GREEN);
     for(int ind=0;ind<NUM_CELLS;ind++){
         coins[ind] = Collectible( NUM_CELLS/6 + rand()%(5*NUM_CELLS/6), rand()%(NUM_CELLS), COLOR_YELLOW, 10);
         bombs[ind] = Collectible( rand()%(NUM_CELLS), rand()%(NUM_CELLS), COLOR_BLACK, -10);
