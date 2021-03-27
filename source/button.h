@@ -20,7 +20,7 @@ public:
     GLfloat radius;
     void press();
     
-protected:
+private:
     VAO *object;
 };
 

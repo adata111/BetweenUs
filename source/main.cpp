@@ -4,6 +4,7 @@
 #include "player.h"
 #include "enemy.h"
 #include "button.h"
+#include "collectible.h"
 #include "input.h"
 
 using namespace std;
@@ -20,8 +21,11 @@ Maze maze1;
 Player player1;
 Enemy enemy1;
 Button vapouriser;
+Collectible coins[100];
+Collectible bombs[100];
 
 const int NUM_CELLS = 24;
+int SCORE = 0;
 const float CELL_SIDE = (float)6/NUM_CELLS;
 const point START = {-3.0f,-3.0f};
 const point END = {3.0f-CELL_SIDE, 3.0f-CELL_SIDE};
@@ -68,6 +72,12 @@ void draw() {
     maze1.draw(VP);
     if(vapouriser.visible)
         vapouriser.draw(VP);
+    for(int ind=0; ind<NUM_CELLS; ind++){
+        if(coins[ind].visible)
+            coins[ind].draw(VP);
+        if(bombs[ind].visible)
+            bombs[ind].draw(VP);
+    }
     player1.draw(VP);
     if(enemy1.visible)
         enemy1.draw(VP);
@@ -108,6 +118,12 @@ void check_obj_collision(){
         vapouriser.visible=0;
         enemy1.visible=0;
     }
+    for(int ind=0; ind<NUM_CELLS; ind++){
+        if(coins[ind].visible && coins[ind].maze_x == player1.maze_x && coins[ind].maze_y==player1.maze_y)
+            coins[ind].collect();
+        if(bombs[ind].visible && bombs[ind].maze_x == player1.maze_x && bombs[ind].maze_y==player1.maze_y)
+            bombs[ind].collect();
+    }
 }
 
 /* Initialize the OpenGL rendering properties */
@@ -115,12 +131,17 @@ void check_obj_collision(){
 void initGL(GLFWwindow *window, int width, int height) {
     /* Objects should be created before any other gl function and shaders */
     // Create the models
-
+    
+    srand (time(NULL));
     maze1       = Maze(0, 0, COLOR_BLACK);
     player1     = Player(0,0, COLOR_BLUE);
     enemy1     = Enemy(13, 12, maze1.maze[13][12].pos, COLOR_RED);
     vapouriser   = Button(NUM_CELLS/2, (NUM_CELLS-1), COLOR_GREEN);
-    // player1     = Player(-1.42, -1.42, COLOR_RED);
+    for(int ind=0;ind<NUM_CELLS;ind++){
+        coins[ind] = Collectible( NUM_CELLS/6 + rand()%(5*NUM_CELLS/6), rand()%(NUM_CELLS), COLOR_YELLOW, 10);
+        bombs[ind] = Collectible( rand()%(NUM_CELLS), rand()%(NUM_CELLS), COLOR_BLACK, -10);
+        // bombs[ind] = Collectible( (ind%2)*(NUM_CELLS/3) + rand()%(NUM_CELLS/2), ((ind+1)%2)*(NUM_CELLS/3) + rand()%(NUM_CELLS/2), COLOR_BLACK, -10);
+    } 
 
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("../source/shaders/shader.vert", "../source/shaders/shader.frag");
@@ -169,6 +190,7 @@ int main(int argc, char **argv) {
             check_obj_collision();
         }
         if (t1.processTick()){
+            std::cout<<"Score: "<<SCORE<<"\n";
             if(enemy1.visible)
                 enemy1.move_dijkstra(maze1.graph, point{(float)player1.maze_x, (float)player1.maze_y});
         }

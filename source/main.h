@@ -88,13 +88,15 @@ extern const color_t COLOR_GREEN;
 extern const color_t COLOR_BLACK;
 extern const color_t COLOR_BLUE;
 extern const color_t COLOR_GREY;
+extern const color_t COLOR_YELLOW;
 extern const color_t COLOR_BACKGROUND;
 
-// positions
+// global game variables
 extern const point START ;
 extern const point END ;
 extern int TASKS ;
 extern const float CELL_SIDE;
 extern const int NUM_CELLS;
+extern int SCORE;
 
 #endif

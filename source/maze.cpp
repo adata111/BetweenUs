@@ -114,7 +114,7 @@ std::vector<std::vector<cell>> prims(std::vector<std::vector<cell>> grid){
     visited[0][1]=-1;
     visited[1][0]=-1;
     
-    srand (time(NULL));
+    // srand (time(NULL));
     while(num_vis<tot){
         if(neighbours.size()==0){
             break;
