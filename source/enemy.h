@@ -18,6 +18,7 @@ public:
     void set_position(float x, float y);
     void tick();
     float speed;
+    bool visible;
     GLfloat radius;
     
     void right();

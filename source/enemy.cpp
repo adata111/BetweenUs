@@ -7,11 +7,12 @@ Enemy::Enemy(int mx, int my, point pos, color_t color) {
     this->position = glm::vec3((START.x+(CELL_SIDE* float(mx+0.5))), (START.y+(CELL_SIDE* float(my+0.5))), 0);
     this->start_pos = this->position;
     // std::cout<<"//////////////////////////////////////\n";
-    std::cout<<position.x<<" "<<position.y<<"\n";
-    std::cout<<pos.x<<" "<<pos.y<<"\n";
+    // std::cout<<position.x<<" "<<position.y<<"\n";
+    // std::cout<<pos.x<<" "<<pos.y<<"\n";
     // this->position = glm::vec3(0.0f,0.0f,0.0f);
     float x = position.x;
     float y = position.y;
+    this->visible = 1;
     this->rotation = 0;
     radius = 1.0f;
     scale_size= (float)CELL_SIDE/5;
@@ -199,7 +200,7 @@ void Enemy::move_dijkstra(std::vector<point> graph[100][100], point player){
             //     std::cout<<"\n";
             // }
             // std::cout<<"dist: "<<dist[i][j]<<"\n";
-            std::cout<<"par: "<<par[i][j].x<<" "<<par[i][j].y<<"\n";
+            // std::cout<<"par: "<<par[i][j].x<<" "<<par[i][j].y<<"\n";
             break;
         }
         temp=minDistance(dist, visited);

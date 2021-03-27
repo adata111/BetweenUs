@@ -3,6 +3,7 @@
 #include "maze.h"
 #include "player.h"
 #include "enemy.h"
+#include "button.h"
 #include "input.h"
 
 using namespace std;
@@ -18,6 +19,7 @@ GLFWwindow *window;
 Maze maze1;
 Player player1;
 Enemy enemy1;
+Button vapouriser;
 
 const int NUM_CELLS = 24;
 const float CELL_SIDE = (float)6/NUM_CELLS;
@@ -64,20 +66,11 @@ void draw() {
 
     // Scene render
     maze1.draw(VP);
+    if(vapouriser.visible)
+        vapouriser.draw(VP);
     player1.draw(VP);
-    // std::vector<int> row;
-    // std::cout<<"hihi1\n";
-    //     vis.clear();
-    // for(int i=0;i<NUM_CELLS;i++){
-    //     for(int j=0;j<NUM_CELLS;j++){
-    //         row.push_back(0);
-    //     }
-    //     std::cout<<i<<"\n";
-    //     vis.push_back(row);
-    // }
-    // std::cout<<enemy1.maze_x<<" "<<enemy1.maze_y<<"\n";
-
-    enemy1.draw(VP);
+    if(enemy1.visible)
+        enemy1.draw(VP);
 }
 
 void tick_input(GLFWwindow *window) {
@@ -102,11 +95,19 @@ void tick_input(GLFWwindow *window) {
             player1.move(point{-1,0});
         key_left = false;
     }
+    
 }
 
 void tick_elements() {
     player1.tick();
     // camera_rotation_angle += 1;
+}
+
+void check_obj_collision(){
+    if(player1.maze_x==vapouriser.maze_x && player1.maze_y==vapouriser.maze_y && vapouriser.visible){
+        vapouriser.visible=0;
+        enemy1.visible=0;
+    }
 }
 
 /* Initialize the OpenGL rendering properties */
@@ -118,6 +119,7 @@ void initGL(GLFWwindow *window, int width, int height) {
     maze1       = Maze(0, 0, COLOR_BLACK);
     player1     = Player(0,0, COLOR_BLUE);
     enemy1     = Enemy(13, 12, maze1.maze[13][12].pos, COLOR_RED);
+    vapouriser   = Button(NUM_CELLS/2, (NUM_CELLS-1), COLOR_GREEN);
     // player1     = Player(-1.42, -1.42, COLOR_RED);
 
     // Create and compile our GLSL program from the shaders
@@ -164,10 +166,11 @@ int main(int argc, char **argv) {
 
             // tick_elements();
             tick_input(window);
+            check_obj_collision();
         }
         if (t1.processTick()){
-            
-            enemy1.move_dijkstra(maze1.graph, point{(float)player1.maze_x, (float)player1.maze_y});
+            if(enemy1.visible)
+                enemy1.move_dijkstra(maze1.graph, point{(float)player1.maze_x, (float)player1.maze_y});
         }
 
         // Poll for Keyboard and mouse events
