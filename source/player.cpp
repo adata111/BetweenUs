@@ -52,6 +52,7 @@ Player::Player(int mx, int my, color_t color) {
     }
     
     std::vector<GLfloat> vertex_buffer_data;
+    std::vector<GLfloat> colour_buffer_data;
     //semi-circle
     for ( int i = 0; i < num_vert; i++ )
     {
@@ -64,6 +65,10 @@ Player::Player(int mx, int my, color_t color) {
     vertex_buffer_data.insert(vertex_buffer_data.end(), {x-radius,y+radius,z, x+radius,y+radius,z, x+radius,y-radius,z}); // top right triangle
     vertex_buffer_data.insert(vertex_buffer_data.end(), {x+radius,y-radius,z, x-radius,y-radius,z, x-radius,y+radius,z}); // bottom left triangle
 
+    //rectangle backpack
+    vertex_buffer_data.insert(vertex_buffer_data.end(), {x-(9.0f*radius/6),y+radius,z, x-radius,y+radius,z, x-radius,y-(5.0f*radius/6),z}); // top right triangle
+    vertex_buffer_data.insert(vertex_buffer_data.end(), {x-radius,y-(5.0f*radius/6),z, x-(9.0f*radius/6),y-(5.0f*radius/6),z, x-(9.0f*radius/6),y+radius,z}); // bottom left triangle
+
     //left leg
     vertex_buffer_data.insert(vertex_buffer_data.end(), {x-radius,y-radius,z, x-(1.0f*radius/6),y-radius,z, x-(1.0f*radius/6),y-2*radius,z}); // top right triangle
     vertex_buffer_data.insert(vertex_buffer_data.end(), {x-(1.0f*radius/6),y-2*radius,z, x-radius,y-2*radius,z, x-radius,y-radius,z}); // bottom left triangle
@@ -72,8 +77,20 @@ Player::Player(int mx, int my, color_t color) {
     vertex_buffer_data.insert(vertex_buffer_data.end(), {x+(1.0f*radius/6),y-radius,z, x+radius,y-radius,z, x+radius,y-2*radius+(1.0f*radius/6),z}); // top right triangle
     vertex_buffer_data.insert(vertex_buffer_data.end(), {x+radius,y-2*radius+(1.0f*radius/6),z, x+(1.0f*radius/6),y-2*radius+(1.0f*radius/6),z, x+(1.0f*radius/6),y-radius,z}); // bottom left triangle
 
+    //rectangle helmet
+    vertex_buffer_data.insert(vertex_buffer_data.end(), {x-(3.0f*radius/6),y+(8.0f*radius/6),z, x+(7.0f*radius/6),y+(8.0f*radius/6),z, x+(7.0f*radius/6),y+(2.0f*radius/6),z}); // top right triangle
+    vertex_buffer_data.insert(vertex_buffer_data.end(), {x+(7.0f*radius/6),y+(2.0f*radius/6),z, x-(3.0f*radius/6),y+(2.0f*radius/6),z, x-(3.0f*radius/6),y+(8.0f*radius/6),z}); // bottom left triangle
+
     int tot_vert = vertex_buffer_data.size()/3;
-    this->object = create3DObject(GL_TRIANGLES, tot_vert, reinterpret_cast<GLfloat *>(vertex_buffer_data.data()), color, GL_FILL);
+    for(int i=0;i<(tot_vert-3*2);i++){
+        colour_buffer_data.insert(colour_buffer_data.end(),{(float)color.r/256,(float)color.g/256,(float)color.b/256});
+    }
+    // helmet colour
+    for(int i=0;i<3*2;i++){
+        colour_buffer_data.insert(colour_buffer_data.end(),{(float)(COLOR_GREY.r)/256,(float)(COLOR_GREY.g)/256,(float)(COLOR_GREY.b)/256});
+    }
+    std::cout<<"vertex: "<<vertex_buffer_data.size()<<"\tcolour: "<<colour_buffer_data.size()<<"\n";
+    this->object = create3DObject(GL_TRIANGLES, tot_vert, reinterpret_cast<const GLfloat *>(vertex_buffer_data.data()), reinterpret_cast<const GLfloat *>(colour_buffer_data.data()), GL_FILL);
 }
 
 void Player::draw(glm::mat4 VP) {

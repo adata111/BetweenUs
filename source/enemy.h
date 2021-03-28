@@ -6,7 +6,7 @@
 class Enemy {
 public:
     Enemy() {}
-    Enemy(int x, int y, point pos, color_t color);
+    Enemy(int x, int y, color_t color);
     glm::vec3 position;
     glm::vec3 start_pos;
     bounding_box_t bounds;

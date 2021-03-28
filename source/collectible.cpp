@@ -4,7 +4,7 @@
 Collectible::Collectible(int mx, int my, color_t color, int points) {
     this->maze_x = mx;
     this->maze_y = my;
-    this->position = glm::vec3((START.x+(CELL_SIDE* float(mx+0.5))), (START.y+(CELL_SIDE* float(my+0.5))), 0);
+    this->position = glm::vec3((START.x+(CELL_SIDE* float(mx+0.5 + (points/abs(points)*0.1)))), (START.y+(CELL_SIDE* float(my+0.5))), 0);
     this->start_pos = this->position;
     // std::cout<<"collectible coords "<<start_pos.x<<" "<<start_pos.y<<"\n";
     float x = position.x;

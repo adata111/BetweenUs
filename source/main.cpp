@@ -26,6 +26,7 @@ Collectible coins[100];
 Collectible bombs[100];
 
 const int NUM_CELLS = 24;
+const int NUM_COLLECT = 12;
 int SCORE = 0;
 const float CELL_SIDE = (float)6/NUM_CELLS;
 const point START = {-3.0f,-3.0f};
@@ -75,7 +76,7 @@ void draw() {
         vapouriser.draw(VP);
     if(release_collectible.visible)
         release_collectible.draw(VP);
-    for(int ind=0; ind<NUM_CELLS; ind++){
+    for(int ind=0; ind<NUM_COLLECT; ind++){
         if(coins[ind].visible)
             coins[ind].draw(VP);
         if(bombs[ind].visible)
@@ -121,7 +122,7 @@ void check_obj_collision(){
         vapouriser.visible=0;
         enemy1.visible=0;
     }
-    for(int ind=0; ind<NUM_CELLS; ind++){
+    for(int ind=0; ind<NUM_COLLECT; ind++){
         if(coins[ind].visible && coins[ind].maze_x == player1.maze_x && coins[ind].maze_y==player1.maze_y)
             coins[ind].collect();
         if(bombs[ind].visible && bombs[ind].maze_x == player1.maze_x && bombs[ind].maze_y==player1.maze_y)
@@ -145,12 +146,12 @@ void initGL(GLFWwindow *window, int width, int height) {
     srand (time(NULL));
     maze1       = Maze(0, 0, COLOR_BLACK);
     player1     = Player(0,0, COLOR_BLUE);
-    enemy1     = Enemy(13, 12, maze1.maze[13][12].pos, COLOR_RED);
-    vapouriser   = Button(NUM_CELLS/2, (NUM_CELLS-1), COLOR_RED_TRUE);
-    release_collectible   = Button(NUM_CELLS/6 + rand()%(5*NUM_CELLS/6), rand()%(NUM_CELLS), COLOR_GREEN);
-    for(int ind=0;ind<NUM_CELLS;ind++){
+    enemy1     = Enemy(1+(NUM_CELLS/2), NUM_CELLS/2, COLOR_RED);
+    vapouriser   = Button(NUM_CELLS/6 + rand()%(5*NUM_CELLS/6), 5*NUM_CELLS/6 + rand()%(NUM_CELLS/6), COLOR_RED_TRUE);
+    release_collectible   = Button(NUM_CELLS/6 + rand()%(5*NUM_CELLS/6), NUM_CELLS/6 + rand()%(5*NUM_CELLS/6), COLOR_GREEN);
+    for(int ind=0;ind<NUM_COLLECT;ind++){
         coins[ind] = Collectible( NUM_CELLS/6 + rand()%(5*NUM_CELLS/6), rand()%(NUM_CELLS), COLOR_YELLOW, 10);
-        bombs[ind] = Collectible( rand()%(NUM_CELLS), rand()%(NUM_CELLS), COLOR_BLACK, -10);
+        bombs[ind] = Collectible( rand()%(NUM_CELLS-1), rand()%(NUM_CELLS), COLOR_BLACK, -10);
         // bombs[ind] = Collectible( (ind%2)*(NUM_CELLS/3) + rand()%(NUM_CELLS/2), ((ind+1)%2)*(NUM_CELLS/3) + rand()%(NUM_CELLS/2), COLOR_BLACK, -10);
     } 
 
