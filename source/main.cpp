@@ -7,6 +7,9 @@
 #include "collectible.h"
 #include "input.h"
 
+#define GLT_IMPLEMENTATION
+#include "gltext.h"
+
 using namespace std;
 
 GLMatrices Matrices;
@@ -28,6 +31,8 @@ Collectible bombs[100];
 const int NUM_CELLS = 24;
 const int NUM_COLLECT = 12;
 int SCORE = 0;
+int TASKS = 0;
+int COUNTDOWN = 60;
 const float CELL_SIDE = (float)6/NUM_CELLS;
 const point START = {-3.0f,-3.0f};
 const point END = {3.0f-CELL_SIDE, 3.0f-CELL_SIDE};
@@ -87,6 +92,54 @@ void draw() {
         enemy1.draw(VP);
 }
 
+void drawText(int width, int height){
+    
+    char score_str[30];
+    char time_str[30];
+    char tasks_str[30];
+
+    // Creating text
+    GLTtext *text = gltCreateText();
+    gltSetText(text, "Between Us");
+    
+    GLTtext *score_text = gltCreateText();
+    GLTtext *time_text = gltCreateText();
+    GLTtext *tasks_text = gltCreateText();
+
+    // Begin text drawing (this for instance calls glUseProgram)
+    gltBeginDraw();
+
+    // Draw any amount of text between begin and end
+    gltColor(1.0f, 1.0f, 1.0f, 1.0f);
+    gltDrawText2DAligned(text,
+    (GLfloat)(width / 2),
+    (GLfloat)(40.0f),
+    1.5f,
+    GLT_CENTER, GLT_TOP);
+
+    sprintf(score_str, "Score: %d", SCORE);
+    gltSetText(score_text, score_str);
+    gltColor(1.0f, 1.0f, 1.0f, 1.0f);
+    gltDrawText2D(score_text, 100.0f, 80.0f, 1.0f);
+    sprintf(time_str, "Time: %d", COUNTDOWN);
+	gltSetText(time_text, time_str);
+    gltColor(1.0f, 1.0f, 1.0f, 1.0f);
+    gltDrawText2D(time_text, (GLfloat)width - 200, 80.0f, 1.0f);
+  
+    sprintf(tasks_str, "Tasks: %d/2", TASKS);
+	gltSetText(tasks_text, tasks_str);
+    gltColor(1.0f, 1.0f, 1.0f, 1.0f);
+    gltDrawText2DAligned(tasks_text, (GLfloat)width/2, 80.0f, 1.0f, GLT_CENTER, GLT_TOP);
+
+    // Finish drawing text
+    gltEndDraw();
+
+    // Deleting text
+    gltDeleteText(text);
+    gltDeleteText(score_text);
+    gltDeleteText(time_text);
+}
+
 void tick_input(GLFWwindow *window) {
 
     if(key_down){
@@ -121,6 +174,8 @@ void check_obj_collision(){
     if(player1.maze_x==vapouriser.maze_x && player1.maze_y==vapouriser.maze_y && vapouriser.visible){
         vapouriser.visible=0;
         enemy1.visible=0;
+        TASKS +=1;
+        SCORE += 50;
     }
     for(int ind=0; ind<NUM_COLLECT; ind++){
         if(coins[ind].visible && coins[ind].maze_x == player1.maze_x && coins[ind].maze_y==player1.maze_y)
@@ -134,6 +189,8 @@ void check_obj_collision(){
             coins[ind].visible=1;
             bombs[ind].visible=1;
         }
+        TASKS+=1;
+        SCORE += 50;
     }
 }
 
@@ -181,10 +238,13 @@ int main(int argc, char **argv) {
     srand(time(0));
     int width  = 900;
     int height = 900;
+    int viewport_width, viewport_height;
 
     window = initGLFW(width, height);
 
     initGL (window, width, height);
+    // Initialize glText
+    gltInit();
     
     /* Draw in loop */
     while (!glfwWindowShouldClose(window)) {
@@ -193,7 +253,9 @@ int main(int argc, char **argv) {
         if (t60.processTick()) {
             // 60 fps
             // OpenGL Draw commands
+            glfwGetFramebufferSize(window, &viewport_width, & viewport_height);
             draw();
+            drawText(viewport_width, viewport_height);
             // Swap Frame Buffer in double buffering
             glfwSwapBuffers(window);
 
@@ -202,7 +264,9 @@ int main(int argc, char **argv) {
             check_obj_collision();
         }
         if (t1.processTick()){
+            // 1 fps
             std::cout<<"Score: "<<SCORE<<"\n";
+            COUNTDOWN--;
             if(enemy1.visible)
                 enemy1.move_dijkstra(maze1.graph, point{(float)player1.maze_x, (float)player1.maze_y});
         }
@@ -210,6 +274,9 @@ int main(int argc, char **argv) {
         // Poll for Keyboard and mouse events
         glfwPollEvents();
     }
+
+    // Destroy glText
+    gltTerminate();
 
     quit(window);
 }
