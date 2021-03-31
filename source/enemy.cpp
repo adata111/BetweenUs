@@ -90,7 +90,7 @@ Enemy::Enemy(int mx, int my, color_t color) {
     for(int i=0;i<3*2;i++){
         colour_buffer_data.insert(colour_buffer_data.end(),{(float)(COLOR_GREY.r)/256,(float)(COLOR_GREY.g)/256,(float)(COLOR_GREY.b)/256});
     }
-    std::cout<<"vertex: "<<vertex_buffer_data.size()<<"\tcolour: "<<colour_buffer_data.size()<<"\n";
+    // std::cout<<"vertex: "<<vertex_buffer_data.size()<<"\tcolour: "<<colour_buffer_data.size()<<"\n";
     this->object = create3DObject(GL_TRIANGLES, tot_vert, reinterpret_cast<const GLfloat *>(vertex_buffer_data.data()), reinterpret_cast<const GLfloat *>(colour_buffer_data.data()), GL_FILL);
 }
 
@@ -158,12 +158,20 @@ point minDistance(std::vector<std::vector<int>> dist,
 	return min_index;
 }
 
-void Enemy::move_dijkstra(std::vector<point> graph[100][100], point player){
+bool Enemy::check_player_collision(point player){
+    if(this->visible==false)
+        return false;
     if(player.x==maze_x && player.y==maze_y){
         std::cout<<"collide\n";
-        this->maze_x = NUM_CELLS-1;
-        this->maze_y = NUM_CELLS-1;
-        this->position = glm::vec3((START.x+(CELL_SIDE* float(maze_x+0.5))), (START.y+(CELL_SIDE* float(maze_y+0.5))), 0);
+        OVER = 2;
+        return true;
+    }
+    return false;
+}
+
+void Enemy::move_dijkstra(std::vector<point> graph[100][100], point player){
+    if(check_player_collision(player)){
+        return;
     }
     std::vector<std::vector<int>> visited;
     std::vector<std::vector<int>> dist;
@@ -230,12 +238,6 @@ void Enemy::move_dijkstra(std::vector<point> graph[100][100], point player){
     if(i!=-1 && j!=-1){
         this->maze_x = par[i][j].x;
         this->maze_y = par[i][j].y;
-        this->position = glm::vec3((START.x+(CELL_SIDE* float(maze_x+0.5))), (START.y+(CELL_SIDE* float(maze_y+0.5))), 0);
-    }
-    if(player.x==maze_x && player.y==maze_y){
-        std::cout<<"collide\n";
-        this->maze_x = NUM_CELLS-1;
-        this->maze_y = NUM_CELLS-1;
         this->position = glm::vec3((START.x+(CELL_SIDE* float(maze_x+0.5))), (START.y+(CELL_SIDE* float(maze_y+0.5))), 0);
     }
     

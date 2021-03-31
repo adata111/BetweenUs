@@ -99,5 +99,6 @@ extern int TASKS ;
 extern const float CELL_SIDE;
 extern const int NUM_CELLS;
 extern int SCORE;
+extern int OVER;
 
 #endif

@@ -89,7 +89,7 @@ Player::Player(int mx, int my, color_t color) {
     for(int i=0;i<3*2;i++){
         colour_buffer_data.insert(colour_buffer_data.end(),{(float)(COLOR_GREY.r)/256,(float)(COLOR_GREY.g)/256,(float)(COLOR_GREY.b)/256});
     }
-    std::cout<<"vertex: "<<vertex_buffer_data.size()<<"\tcolour: "<<colour_buffer_data.size()<<"\n";
+    // std::cout<<"vertex: "<<vertex_buffer_data.size()<<"\tcolour: "<<colour_buffer_data.size()<<"\n";
     this->object = create3DObject(GL_TRIANGLES, tot_vert, reinterpret_cast<const GLfloat *>(vertex_buffer_data.data()), reinterpret_cast<const GLfloat *>(colour_buffer_data.data()), GL_FILL);
 }
 
@@ -135,11 +135,14 @@ void Player::down(){
 }
 
 void Player::move(point dir){
+    int mx=this->maze_x;int my=this->maze_y;
+    if(mx==END.x && my==END.y && TASKS==2){
+        OVER=3;
+    }
     this->position.x += speed*dir.x;
     this->position.y += speed*dir.y;
     this->maze_x += dir.x;
     this->maze_y += dir.y;
-    int mx=this->maze_x;int my=this->maze_y;
     // this->position = glm::vec3((START.x+(CELL_SIDE* float(mx+0.5))), (START.y+(CELL_SIDE* float(my+0.5))), 0);
     this->bounds.x = this->position.x;
     this->bounds.y = this->position.y;

@@ -7,4 +7,4 @@ const color_t COLOR_BLACK = { 52, 73, 94 };
 const color_t COLOR_BLUE = {30,144,255};    // dodger blue
 const color_t COLOR_GREY = {192,192,192};   // silver
 const color_t COLOR_YELLOW = {255,215,0};   // gold
-const color_t COLOR_BACKGROUND = { 242, 241, 239 };
+const color_t COLOR_BACKGROUND = { 0, 0, 0 };

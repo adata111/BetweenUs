@@ -26,6 +26,7 @@ public:
     void up();
     void down();
     
+    bool check_player_collision(point player);
     void move_dijkstra(std::vector<point> graph[100][100], point player);
     // point dijkstra(int x, int y, std::vector<point> graph[100][100], std::vector<std::vector<int>> vis, int dest_x, int dest_y, point dir_moved);
 private:

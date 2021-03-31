@@ -33,9 +33,10 @@ const int NUM_COLLECT = 12;
 int SCORE = 0;
 int TASKS = 0;
 int COUNTDOWN = 60;
+int OVER = 0;       // 1 for reactor meltdown, 2 for imposter killing
 const float CELL_SIDE = (float)6/NUM_CELLS;
-const point START = {-3.0f,-3.0f};
-const point END = {3.0f-CELL_SIDE, 3.0f-CELL_SIDE};
+const point START = {-3.0f,-3.0f};              // coordinates of first cell 
+const point END = {NUM_CELLS-1, NUM_CELLS-1};   // index of end cell
 std::vector<std::vector<int>> vis;
 
 float screen_zoom = 1, screen_center_x = 0, screen_center_y = 0;
@@ -140,6 +141,56 @@ void drawText(int width, int height){
     gltDeleteText(time_text);
 }
 
+void draw_game_over(int width, int height){
+    
+    char score_str[30]; 
+    char time_str[30];
+    // Creating text
+    GLTtext *text = gltCreateText();
+    gltSetText(text, "GAME OVER!");
+    GLTtext *result_text = gltCreateText();
+    GLTtext *score_text = gltCreateText();
+    GLTtext *time_text = gltCreateText();
+    GLTtext *mess_text = gltCreateText();
+
+    // Begin text drawing (this for instance calls glUseProgram)
+    gltBeginDraw();
+
+    // Draw any amount of text between begin and end
+    gltColor(1.0f, 1.0f, 1.0f, 1.0f);
+    gltDrawText2DAligned(text,
+    (GLfloat)(width / 2),
+    (GLfloat)((height / 2)-100),
+    1.5f,
+    GLT_CENTER, GLT_CENTER);
+
+    if(OVER==3)
+        gltSetText(result_text, "YOU WON! :D");
+    else
+        gltSetText(result_text, "YOU LOST! :(");
+    gltColor(1.0f, 1.0f, 1.0f, 1.0f);
+    gltDrawText2DAligned(result_text, (GLfloat)(width / 2), (GLfloat)((height / 2)), 2.0f, GLT_CENTER,GLT_CENTER);
+
+    if(OVER==2)
+        gltSetText(mess_text, "That imposter was way too fast ;-;");
+    else if(OVER==1)
+        gltSetText(mess_text, "Try to complete tasks and reach END before reactor meltdown!");
+    else if(OVER==3)
+        gltSetText(mess_text, "Great Work!");
+    gltColor(1.0f, 1.0f, 1.0f, 1.0f);
+    gltDrawText2DAligned(mess_text, (GLfloat)(width / 2), (GLfloat)((height / 2)+50), 1.5f, GLT_CENTER,GLT_CENTER);
+    
+    sprintf(score_str, "Score: %d", SCORE);
+    gltSetText(score_text, score_str);
+    gltColor(1.0f, 1.0f, 1.0f, 1.0f);
+    gltDrawText2DAligned(score_text, (GLfloat)(width / 2), (GLfloat)((height / 2)+150), 1.5f, GLT_CENTER,GLT_CENTER);
+    
+    sprintf(time_str, "Time left: %d", COUNTDOWN);
+	gltSetText(time_text, time_str);
+    gltColor(1.0f, 1.0f, 1.0f, 1.0f);
+    gltDrawText2DAligned(time_text, (GLfloat)(width/2), (GLfloat)((height / 2)+200), 1.5f, GLT_CENTER, GLT_CENTER);
+}
+
 void tick_input(GLFWwindow *window) {
 
     if(key_down){
@@ -239,6 +290,7 @@ int main(int argc, char **argv) {
     int width  = 900;
     int height = 900;
     int viewport_width, viewport_height;
+    bool check = false;
 
     window = initGLFW(width, height);
 
@@ -254,19 +306,37 @@ int main(int argc, char **argv) {
             // 60 fps
             // OpenGL Draw commands
             glfwGetFramebufferSize(window, &viewport_width, & viewport_height);
-            draw();
-            drawText(viewport_width, viewport_height);
-            // Swap Frame Buffer in double buffering
-            glfwSwapBuffers(window);
+            if(!OVER){    
+                draw();
+                drawText(viewport_width, viewport_height);
+                // Swap Frame Buffer in double buffering
+                glfwSwapBuffers(window);
 
-            // tick_elements();
-            tick_input(window);
-            check_obj_collision();
+                // tick_elements();
+                tick_input(window);
+                check_obj_collision();
+                if(enemy1.visible)
+                    enemy1.check_player_collision(point{(float)player1.maze_x, (float)player1.maze_y});
+
+            }
+            else{
+                if(!check){
+                    glClearColor (COLOR_BACKGROUND.r / 256.0, COLOR_BACKGROUND.g / 256.0, COLOR_BACKGROUND.b / 256.0, 0.0f); // R, G, B, A
+                    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                    draw_game_over(viewport_width, viewport_height);
+                    // Swap Frame Buffer in double buffering
+                    glfwSwapBuffers(window);
+                }
+                // tick_elements();
+                tick_input(window);
+            }
         }
-        if (t1.processTick()){
+        if (t1.processTick() && !OVER){
             // 1 fps
             std::cout<<"Score: "<<SCORE<<"\n";
             COUNTDOWN--;
+            if(COUNTDOWN<=0)
+                OVER= 1;    // reactor meltdown
             if(enemy1.visible)
                 enemy1.move_dijkstra(maze1.graph, point{(float)player1.maze_x, (float)player1.maze_y});
         }
