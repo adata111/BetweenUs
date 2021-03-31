@@ -2,7 +2,7 @@
 #include "timer.h"
 #include "maze.h"
 #include "player.h"
-#include "enemy.h"
+#include "imposter.h"
 #include "button.h"
 #include "collectible.h"
 #include "input.h"
@@ -22,7 +22,7 @@ GLFWwindow *window;
 
 Maze maze1;
 Player player1;
-Enemy enemy1;
+Imposter imposter1;
 Button vapouriser;
 Button release_collectible;
 Collectible coins[100];
@@ -89,8 +89,8 @@ void draw() {
             bombs[ind].draw(VP);
     }
     player1.draw(VP);
-    if(enemy1.visible)
-        enemy1.draw(VP);
+    if(imposter1.visible)
+        imposter1.draw(VP);
 }
 
 void drawText(int width, int height){
@@ -106,6 +106,9 @@ void drawText(int width, int height){
     GLTtext *score_text = gltCreateText();
     GLTtext *time_text = gltCreateText();
     GLTtext *tasks_text = gltCreateText();
+    GLTtext *end_text = gltCreateText();
+    GLTtext *start_text = gltCreateText();
+    GLTtext *light_text = gltCreateText();
 
     // Begin text drawing (this for instance calls glUseProgram)
     gltBeginDraw();
@@ -130,7 +133,19 @@ void drawText(int width, int height){
     sprintf(tasks_str, "Tasks: %d/2", TASKS);
 	gltSetText(tasks_text, tasks_str);
     gltColor(1.0f, 1.0f, 1.0f, 1.0f);
-    gltDrawText2DAligned(tasks_text, (GLfloat)width/2, 80.0f, 1.0f, GLT_CENTER, GLT_TOP);
+    gltDrawText2DAligned(tasks_text, (GLfloat)((width/2)+50), 80.0f, 1.0f, GLT_CENTER, GLT_TOP);
+    
+	gltSetText(light_text, "Light: ON");
+    gltColor(0.0f, 1.0f, 0.0f, 1.0f);
+    gltDrawText2DAligned(light_text, (GLfloat)((width/2)-50), 80.0f, 1.0f, GLT_CENTER, GLT_TOP);
+
+	gltSetText(start_text, "START");
+    gltColor(0.0f, 1.0f, 0.0f, 1.0f);
+    gltDrawText2D(start_text, 70.0f, (GLfloat)(height-120.0f), 1.0f);
+
+	gltSetText(end_text, "END");
+    gltColor(0.0f, 1.0f, 0.0f, 1.0f);
+    gltDrawText2D(end_text, (GLfloat)width - 120, 110.0f, 1.0f);
 
     // Finish drawing text
     gltEndDraw();
@@ -139,6 +154,10 @@ void drawText(int width, int height){
     gltDeleteText(text);
     gltDeleteText(score_text);
     gltDeleteText(time_text);
+    gltDeleteText(tasks_text);
+    gltDeleteText(start_text);
+    gltDeleteText(end_text);
+    gltDeleteText(light_text);
 }
 
 void draw_game_over(int width, int height){
@@ -164,11 +183,14 @@ void draw_game_over(int width, int height){
     1.5f,
     GLT_CENTER, GLT_CENTER);
 
-    if(OVER==3)
+    if(OVER==3){
         gltSetText(result_text, "YOU WON! :D");
-    else
+        gltColorMe(COLOR_GREEN, 1.0f);
+    }
+    else{
         gltSetText(result_text, "YOU LOST! :(");
-    gltColor(1.0f, 1.0f, 1.0f, 1.0f);
+        gltColorMe(COLOR_RED, 1.0f);
+    }
     gltDrawText2DAligned(result_text, (GLfloat)(width / 2), (GLfloat)((height / 2)), 2.0f, GLT_CENTER,GLT_CENTER);
 
     if(OVER==2)
@@ -189,6 +211,16 @@ void draw_game_over(int width, int height){
 	gltSetText(time_text, time_str);
     gltColor(1.0f, 1.0f, 1.0f, 1.0f);
     gltDrawText2DAligned(time_text, (GLfloat)(width/2), (GLfloat)((height / 2)+200), 1.5f, GLT_CENTER, GLT_CENTER);
+    
+    // Finish drawing text
+    gltEndDraw();
+
+    // Deleting text
+    gltDeleteText(text);
+    gltDeleteText(result_text);
+    gltDeleteText(mess_text);
+    gltDeleteText(score_text);
+    gltDeleteText(time_text);
 }
 
 void tick_input(GLFWwindow *window) {
@@ -224,7 +256,7 @@ void tick_elements() {
 void check_obj_collision(){
     if(player1.maze_x==vapouriser.maze_x && player1.maze_y==vapouriser.maze_y && vapouriser.visible){
         vapouriser.visible=0;
-        enemy1.visible=0;
+        imposter1.visible=0;
         TASKS +=1;
         SCORE += 50;
     }
@@ -252,14 +284,14 @@ void initGL(GLFWwindow *window, int width, int height) {
     // Create the models
     
     srand (time(NULL));
-    maze1       = Maze(0, 0, COLOR_BLACK);
+    maze1       = Maze(0, 0, COLOR_LIGHTER_BLACK);
     player1     = Player(0,0, COLOR_BLUE);
-    enemy1     = Enemy(1+(NUM_CELLS/2), NUM_CELLS/2, COLOR_RED);
+    imposter1     = Imposter(1+(NUM_CELLS/2), NUM_CELLS/2, COLOR_RED);
     vapouriser   = Button(NUM_CELLS/6 + rand()%(5*NUM_CELLS/6), 5*NUM_CELLS/6 + rand()%(NUM_CELLS/6), COLOR_RED_TRUE);
     release_collectible   = Button(NUM_CELLS/6 + rand()%(5*NUM_CELLS/6), NUM_CELLS/6 + rand()%(5*NUM_CELLS/6), COLOR_GREEN);
     for(int ind=0;ind<NUM_COLLECT;ind++){
         coins[ind] = Collectible( NUM_CELLS/6 + rand()%(5*NUM_CELLS/6), rand()%(NUM_CELLS), COLOR_YELLOW, 10);
-        bombs[ind] = Collectible( rand()%(NUM_CELLS-1), rand()%(NUM_CELLS), COLOR_BLACK, -10);
+        bombs[ind] = Collectible( rand()%(NUM_CELLS-1), rand()%(NUM_CELLS), COLOR_LIGHTER_BLACK, -10);
         // bombs[ind] = Collectible( (ind%2)*(NUM_CELLS/3) + rand()%(NUM_CELLS/2), ((ind+1)%2)*(NUM_CELLS/3) + rand()%(NUM_CELLS/2), COLOR_BLACK, -10);
     } 
 
@@ -316,8 +348,8 @@ int main(int argc, char **argv) {
                 // tick_elements();
                 tick_input(window);
                 check_obj_collision();
-                if(enemy1.visible)
-                    enemy1.check_player_collision(point{(float)player1.maze_x, (float)player1.maze_y});
+                if(imposter1.visible)
+                    imposter1.check_player_collision(point{(float)player1.maze_x, (float)player1.maze_y});
 
             }
             else{
@@ -338,8 +370,8 @@ int main(int argc, char **argv) {
             COUNTDOWN--;
             if(COUNTDOWN<=0)
                 OVER= 1;    // reactor meltdown
-            if(enemy1.visible)
-                enemy1.move_dijkstra(maze1.graph, point{(float)player1.maze_x, (float)player1.maze_y});
+            if(imposter1.visible)
+                imposter1.move_dijkstra(maze1.graph, point{(float)player1.maze_x, (float)player1.maze_y});
         }
 
         // Poll for Keyboard and mouse events

@@ -126,6 +126,7 @@ GLT_API void gltDrawText2DAligned(GLTtext *text, GLfloat x, GLfloat y, GLfloat s
 
 GLT_API void gltDrawText3D(GLTtext *text, GLfloat x, GLfloat y, GLfloat z, GLfloat scale, GLfloat view[16], GLfloat projection[16]);
 
+GLT_API void gltColorMe(color_t color, GLfloat a);
 GLT_API void gltColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
 GLT_API void gltGetColor(GLfloat *r, GLfloat *g, GLfloat *b, GLfloat *a);
 
@@ -491,6 +492,9 @@ GLT_API void gltDrawText3D(GLTtext *text, GLfloat x, GLfloat y, GLfloat z, GLflo
 	_gltDrawText();
 }
 
+GLT_API void gltColorMe(color_t color, GLfloat a){
+	gltColor((GLfloat)color.r/256.0, color.g/256.0, color.b/256.0, a);
+}
 GLT_API void gltColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
 {
 	glUniform4f(_gltText2DShaderColorUniformLocation, r, g, b, a);

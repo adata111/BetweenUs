@@ -90,6 +90,7 @@ extern const color_t COLOR_BLUE;
 extern const color_t COLOR_GREY;
 extern const color_t COLOR_YELLOW;
 extern const color_t COLOR_RED_TRUE;
+extern const color_t COLOR_LIGHTER_BLACK;
 extern const color_t COLOR_BACKGROUND;
 
 // global game variables

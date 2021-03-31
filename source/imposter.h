@@ -1,12 +1,12 @@
 #include "main.h"
 
-#ifndef ENEMY_H
-#define ENEMY_H
+#ifndef IMPOSTER_H
+#define IMPOSTER_H
 
-class Enemy {
+class Imposter {
 public:
-    Enemy() {}
-    Enemy(int x, int y, color_t color);
+    Imposter() {}
+    Imposter(int x, int y, color_t color);
     glm::vec3 position;
     glm::vec3 start_pos;
     bounding_box_t bounds;
@@ -33,4 +33,4 @@ private:
     VAO *object;
 };
 
-#endif // ENEMY_H
+#endif // IMPOSTER_H

@@ -1,7 +1,7 @@
-#include "enemy.h"
+#include "imposter.h"
 #include "main.h"
 
-Enemy::Enemy(int mx, int my, color_t color) {
+Imposter::Imposter(int mx, int my, color_t color) {
     this->maze_x = mx;
     this->maze_y = my;
     this->position = glm::vec3((START.x+(CELL_SIDE* float(mx+0.5))), (START.y+(CELL_SIDE* float(my+0.5))), 0);
@@ -98,7 +98,7 @@ Enemy::Enemy(int mx, int my, color_t color) {
     this->object = create3DObject(GL_TRIANGLES, tot_vert, reinterpret_cast<const GLfloat *>(vertex_buffer_data.data()), reinterpret_cast<const GLfloat *>(colour_buffer_data.data()), GL_FILL);
 }
 
-void Enemy::draw(glm::mat4 VP) {
+void Imposter::draw(glm::mat4 VP) {
      Matrices.model = glm::mat4(1.0f);
     // this->position = glm::vec3(START.x + (float)CELL_SIDE*this->maze_x, START.y + (float)CELL_SIDE*this->maze_y, 0.0f);
     glm::mat4 translate = glm::translate (this->position);    // glTranslatef
@@ -115,26 +115,26 @@ void Enemy::draw(glm::mat4 VP) {
     draw3DObject(this->object);
 }
 
-void Enemy::set_position(float x, float y) {
+void Imposter::set_position(float x, float y) {
     this->position = glm::vec3(x, y, 0);
 }
 
-void Enemy::tick() {
+void Imposter::tick() {
     // this->rotation += speed;
     // this->position.x -= speed;
     // this->position.y -= speed;
 }
 
-void Enemy::right(){
+void Imposter::right(){
     this->position.x += speed;
 }
-void Enemy::left(){
+void Imposter::left(){
     this->position.x -= speed;
 }
-void Enemy::up(){
+void Imposter::up(){
     this->position.y += speed;
 }
-void Enemy::down(){
+void Imposter::down(){
     this->position.y -= speed;
 }
 
@@ -162,7 +162,7 @@ point minDistance(std::vector<std::vector<int>> dist,
 	return min_index;
 }
 
-bool Enemy::check_player_collision(point player){
+bool Imposter::check_player_collision(point player){
     if(this->visible==false)
         return false;
     if(player.x==maze_x && player.y==maze_y){
@@ -173,7 +173,7 @@ bool Enemy::check_player_collision(point player){
     return false;
 }
 
-void Enemy::move_dijkstra(std::vector<point> graph[100][100], point player){
+void Imposter::move_dijkstra(std::vector<point> graph[100][100], point player){
     if(check_player_collision(player)){
         return;
     }
