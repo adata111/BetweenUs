@@ -134,11 +134,18 @@ void Player::down(){
     this->position.y -= speed;
 }
 
-void Player::move(point dir){
+bool Player::check_reached_end(){
     int mx=this->maze_x;int my=this->maze_y;
     if(mx==END.x && my==END.y && TASKS==2){
         OVER=3;
+        return true;
     }
+    return false;
+}
+void Player::move(point dir){
+    int mx=this->maze_x;int my=this->maze_y;
+    if(check_reached_end())
+        return;
     this->position.x += speed*dir.x;
     this->position.y += speed*dir.y;
     this->maze_x += dir.x;

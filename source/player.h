@@ -25,6 +25,7 @@ public:
     void up();
     void down();
     
+    bool check_reached_end();
     void move(point dir);
 private:
     VAO *object;

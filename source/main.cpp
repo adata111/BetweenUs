@@ -312,6 +312,7 @@ int main(int argc, char **argv) {
                 // Swap Frame Buffer in double buffering
                 glfwSwapBuffers(window);
 
+                player1.check_reached_end();
                 // tick_elements();
                 tick_input(window);
                 check_obj_collision();
