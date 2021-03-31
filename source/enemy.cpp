@@ -83,6 +83,10 @@ Enemy::Enemy(int mx, int my, color_t color) {
     vertex_buffer_data.insert(vertex_buffer_data.end(), {x+(7.0f*radius/6),y+(2.0f*radius/6),z, x-(3.0f*radius/6),y+(2.0f*radius/6),z, x-(3.0f*radius/6),y+(8.0f*radius/6),z}); // bottom left triangle
     
     int tot_vert = vertex_buffer_data.size()/3;
+    // Make the imposter face left i.e. flip along y axis
+    for(int i=0;i<3*tot_vert;i+=3){
+        vertex_buffer_data[i] = -vertex_buffer_data[i];
+    }
     for(int i=0;i<(tot_vert-3*2);i++){
         colour_buffer_data.insert(colour_buffer_data.end(),{(float)color.r/256,(float)color.g/256,(float)color.b/256});
     }
