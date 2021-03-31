@@ -17,12 +17,12 @@ Collectible::Collectible(int mx, int my, color_t color, int points) {
     // scale_size = 1.0f;
     // radius *= scale_size;
     speed = CELL_SIDE;
-    int num_vert = 20*3;
+    int num_vert = (points+14)*3;
     int num_sides = num_vert/3;
     GLfloat z= 0.0f;
-    GLfloat circleVerticesX[num_vert];
-    GLfloat circleVerticesY[num_vert];
-    GLfloat circleVerticesZ[num_vert];
+    GLfloat circleVerticesX[2*num_vert];
+    GLfloat circleVerticesY[2*num_vert];
+    GLfloat circleVerticesZ[2*num_vert];
     float circle_x=x, circle_y=y;
     circleVerticesX[0] = circle_x;
     circleVerticesY[0] = circle_y;
@@ -49,6 +49,29 @@ Collectible::Collectible(int mx, int my, color_t color, int points) {
             circleVerticesZ[k] = z;
         }
     }
+    if(points<0){
+        for ( int i = num_vert,k=num_vert; k < 2*num_vert; i++,k++ )
+        {
+            circleVerticesX[k] = circle_x + ( radius * cos( (i-1.5) * 2 * M_PI /num_sides ) );
+            circleVerticesY[k] = circle_y + ( radius * sin( (i-1.5) * 2 * M_PI/ num_sides) );
+            circleVerticesZ[k] = z;
+            if(k%3==2){
+                ++k;
+                if(k>=2*num_vert)
+                    break;
+                circleVerticesX[k] = circleVerticesX[0];
+                circleVerticesY[k] = circleVerticesY[0];
+                circleVerticesZ[k] = z;
+                
+                ++k;
+                if(k>=2*num_vert)
+                    break;
+                circleVerticesX[k] = circleVerticesX[k-2];
+                circleVerticesY[k] = circleVerticesY[k-2];
+                circleVerticesZ[k] = z;
+            }
+        }
+    }
     
     std::vector<GLfloat> vertex_buffer_data;
     //circle
@@ -57,6 +80,14 @@ Collectible::Collectible(int mx, int my, color_t color, int points) {
         vertex_buffer_data.push_back(circleVerticesX[i]);
         vertex_buffer_data.push_back(circleVerticesY[i]);
         vertex_buffer_data.push_back( circleVerticesZ[i]);
+    }
+    if(points<0){
+        for ( int i = num_vert; i < 2*num_vert; i++ )
+        {
+            vertex_buffer_data.push_back(circleVerticesX[i]);
+            vertex_buffer_data.push_back(circleVerticesY[i]);
+            vertex_buffer_data.push_back( circleVerticesZ[i]);
+        }
     }
 
     int tot_vert = vertex_buffer_data.size()/3;

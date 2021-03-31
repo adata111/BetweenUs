@@ -333,7 +333,7 @@ int main(int argc, char **argv) {
         }
         if (t1.processTick() && !OVER){
             // 1 fps
-            std::cout<<"Score: "<<SCORE<<"\n";
+            // std::cout<<"Score: "<<SCORE<<"\n";
             COUNTDOWN--;
             if(COUNTDOWN<=0)
                 OVER= 1;    // reactor meltdown
